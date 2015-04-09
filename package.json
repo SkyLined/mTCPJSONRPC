@@ -1,0 +1,36 @@
+{
+  "name": "mtcpjsonrpc",
+  "description": "Module with classes to call remote procedures using JSON over TCP",
+  "keywords": [
+    "TCP",
+    "JSON",
+    "RPC",
+    "remote",
+    "network",
+    "data",
+    "server",
+    "client",
+    "stream"
+  ],
+  "version": "0.0.0",
+  "author": {
+    "name": "SkyLined",
+    "email": "berendjanwever@gmail.com",
+    "url": "https://github.com/SkyLined"
+  },
+  "bugs": {
+    "url": "https://github.com/SkyLined/mTCPJSONRPC/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/SkyLined/mTCPJSONRPC"
+  },
+  "dependencies": {
+    "mtcpjson": "~0.0.6"
+  },
+  "main": "./index.js",
+  "engines": {
+    "node": ">=0.8.0"
+  },
+  "license": "CC0-1.0"
+}
