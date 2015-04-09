@@ -26,7 +26,7 @@
     "url": "git://github.com/SkyLined/mTCPJSONRPC"
   },
   "dependencies": {
-    "mtcpjson": "~0.0.6"
+    "mtcpjson": "~0.0.8"
   },
   "main": "./index.js",
   "engines": {
