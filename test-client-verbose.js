@@ -1,8 +1,6 @@
 var mTCPJSONRPC = require("../mTCPJSONRPC");
 
-var bServerCallFinished = false,
-    bClientCallHandled = false,
-    dfProcedures = {
+var dfProcedures = {
       "test": function (oConnection, xData, fCallback) {
         console.log("test call: received (" + JSON.stringify(xData) + ")");
         fCallback(undefined, "test call result"); // (oError, xResult)
