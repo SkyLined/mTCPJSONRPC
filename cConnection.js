@@ -1,8 +1,8 @@
 module.exports = cConnection;
 
 var mDomain = require("domain"),
-    mEvents = require("events"),
     oErrorCodes = require("./oErrorCodes"),
+    mEvents = require("events"),
     mUtil = require("util");
 
 // Communcation is base on JSON-RPC 2.0, but allows "full-duplex" RPC: both ends of a connection can make requests,
@@ -113,8 +113,7 @@ cConnection.prototype.fCall = function cConnection_fCall(sProcedure, xParameters
 };
 cConnection.prototype.fDisconnect = function cConnection_fDisconnect() {
   var oThis = this;
-  if (oThis._oTCPJSONConnection == null) throw new Error("The connection ius already disconnected");
-  oThis._oTCPJSONConnection.fDisconnect();
+  oThis._oTCPJSONConnection && oThis._oTCPJSONConnection.fDisconnect();
 };
 function cConnection_fSendInitializationMessage(oThis, sType, sVersion, fCallback) {
   var dxMessage = {

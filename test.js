@@ -50,6 +50,7 @@ oServer.on("connect", function (oConnection) {
   });
 });
 fConnect(function (oError, oConnection) {
+  if (oError) throw oError;
   console.log("connection established on client-side");
   oConnection.on("initialize", function () {
     console.log("connection initialized on client-side");

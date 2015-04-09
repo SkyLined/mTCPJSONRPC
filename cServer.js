@@ -1,21 +1,20 @@
 module.exports = cServer;
 
-var mEvents = require("events"),
-    mOS = require("os"),
-    mUtil = require("util"),
+var cConnection = require("./cConnection"),
+    mEvents = require("events"),
     mTCPJSON = require("mTCPJSON"),
-    cConnection = require("./cConnection");
+    mUtil = require("util");
 
 
 function cServer(dxOptions) {
   if (this.constructor != arguments.callee) return new arguments.callee(dxOptions);
-  // options: uIPVersion, sHostname, uPort, uConnectionKeepAlive (ms)
+  // options: uIPVersion, sHostname, uPort, uConnectionKeepAlive (ms), dfProcedures
   // emits: error, start, connect, stop
   var oThis = this;
   dxOptions = dxOptions || {};
-  oThis._uIPVersion = dxOptions.uIPVersion || 4;
-  var sHostname = dxOptions.sHostname || mOS.hostname();
-  oThis._uPort = dxOptions.uPort || 28876;
+  oThis._uIPVersion = dxOptions.uIPVersion;
+  var sHostname = dxOptions.sHostname;
+  oThis._uPort = dxOptions.uPort;
   var uConnectionKeepAlive = dxOptions.uConnectionKeepAlive;
   oThis.dfProcedures = dxOptions.dfProcedures || {};
   oThis._oTCPJSONServer = mTCPJSON.cServer({
@@ -58,7 +57,6 @@ cServer.prototype.toString = function cServer_toString() {
 
 cServer.prototype.fStop = function cServer_fStop(bDisconnect) {
   var oThis = this;
-  if (oThis._oTCPJSONServer == null) throw new Error("The server is already stopped");
-  oThis._oTCPJSONServer.fStop(bDisconnect);
+  oThis._oTCPJSONServer && oThis._oTCPJSONServer.fStop(bDisconnect);
 };
 

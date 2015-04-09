@@ -1,17 +1,15 @@
 module.exports = fConnect;
 
-var mNet = require("net"),
-    mOS = require("os"),
-    mTCPJSON = require("mTCPJSON"),
-    cConnection = require("./cConnection");
+var cConnection = require("./cConnection"),
+    mTCPJSON = require("mTCPJSON");
 
 function fConnect(fCallback, dxOptions) {
   // dxOptions: uIPVersion, sHostname, uPort, uConnectionKeepAlive (ms)
   // callback args: oError, oConnection
   dxOptions = dxOptions || {};
-  var uIPVersion = dxOptions.uIPVersion || 4;
-  var sHostname = dxOptions.sHostname || mOS.hostname();
-  var uPort = dxOptions.uPort || 28876;
+  var uIPVersion = dxOptions.uIPVersion;
+  var sHostname = dxOptions.sHostname;
+  var uPort = dxOptions.uPort;
   var uConnectionKeepAlive = dxOptions.uConnectionKeepAlive;
   var dfProcedures = dxOptions.dfProcedures || {};
   mTCPJSON.fConnect(function (oError, oTCPJSONConnection) {
