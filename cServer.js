@@ -24,16 +24,17 @@ function cServer(dxOptions) {
     "uPort": oThis._uPort,
     "uConnectionKeepAlive": uConnectionKeepAlive,
   });
+  var sId = "RPC@" + oThis._oTCPJSONServer.sId;
+  Object.defineProperty(oThis, "sId", {"get": function () { return sId; }});
+  var bStarted = false;
+  Object.defineProperty(oThis, "bStarted", {"get": function () { return bStarted; }});
+  Object.defineProperty(oThis, "bStopped", {"get": function () { return oThis._oTCPJSONServer == null; }});
   oThis._oTCPJSONServer.on("start", function() {
-    process.nextTick(function() {
-      oThis.emit("start");
-    });
+    bStarted = true;
+    oThis.emit("start");
   });
   oThis._oTCPJSONServer.on("error", function(oError) {
-    process.nextTick(function() {
-      oThis.emit("error", oError); // pass-through
-      oThis.fStop();
-    });
+    oThis.emit("error", oError); // pass-through
   });
   oThis._oTCPJSONServer.on("connect", function(oTCPJSONConnection) {
     // Use the TCP JSON connection to make an RPC connection.
@@ -50,8 +51,14 @@ function cServer(dxOptions) {
 };
 mUtil.inherits(cServer, mEvents.EventEmitter);
 
+cServer.prototype.toString = function cServer_toString() {
+  var oThis = this;
+  return oThis.sId;
+};
+
 cServer.prototype.fStop = function cServer_fStop(bDisconnect) {
   var oThis = this;
+  if (oThis._oTCPJSONServer == null) throw new Error("The server is already stopped");
   oThis._oTCPJSONServer.fStop(bDisconnect);
 };
 

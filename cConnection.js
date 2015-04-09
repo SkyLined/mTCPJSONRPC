@@ -69,7 +69,10 @@ function cConnection(oTCPJSONConnection, bRequestVersion, dxOptions) {
   dxOptions = dxOptions || {};
   oThis.dfProcedures = dxOptions.dfProcedures || {};
   oThis._uResultTimeout = dxOptions.uResultTimeout || 10000; // default 10 seconds
+  var sId = "RPC" + sVersion + "@" + oTCPJSONConnection.toString();
+  Object.defineProperty(oThis, "sId", {"get": function () { return sId; }});
   oThis._oTCPJSONConnection = oTCPJSONConnection;
+  Object.defineProperty(oThis, "bConnected", {"get": function () { return oThis._oTCPJSONConnection != null; }});
   oThis._uCallbackIdCounter = 0;
   oThis._dfPendingCallbacks = {};
   oThis._dfPendingCallbackTimeouts = {};
@@ -78,6 +81,7 @@ function cConnection(oTCPJSONConnection, bRequestVersion, dxOptions) {
     oThis.emit("error", oError);
   });
   oThis._oTCPJSONConnection.on("disconnect", function () {
+    oThis._oTCPJSONConnection = null;
     var oError = new Error("Connection closed");
     oError.code = oErrorCodes.iConnectionFailed;
     for (var uId in oThis._dfPendingCallbacks) {
@@ -94,21 +98,22 @@ function cConnection(oTCPJSONConnection, bRequestVersion, dxOptions) {
   });
   if (bRequestVersion) {
     cConnection_fSendInitializationMessage(oThis, sInitializationVersionRequest, sVersion);
-  }
+  };
 };
 mUtil.inherits(cConnection, mEvents.EventEmitter);
 
 cConnection.prototype.toString = function cConnection_toString() {
   var oThis = this;
-  return "RPC" + sVersion + "@" + oThis._oTCPJSONConnection.toString();
+  return oThis.sId;
 };
-cConnection.prototype.fCall = function cConnection_fNotify(sProcedure, xParameters, fResultCallback) {
+cConnection.prototype.fCall = function cConnection_fCall(sProcedure, xParameters, fResultCallback) {
   var oThis = this;
   if (!oThis._bInitialized) throw new Error("Cannot call remote procedure before connection is initialized");
   cConnection_fSendCallMessage(oThis, sProcedure, xParameters, fResultCallback);
 };
 cConnection.prototype.fDisconnect = function cConnection_fDisconnect() {
   var oThis = this;
+  if (oThis._oTCPJSONConnection == null) throw new Error("The connection ius already disconnected");
   oThis._oTCPJSONConnection.fDisconnect();
 };
 function cConnection_fSendInitializationMessage(oThis, sType, sVersion, fCallback) {
