@@ -111,7 +111,7 @@ cConnection.prototype.fDisconnect = function cConnection_fDisconnect() {
   var oThis = this;
   oThis._oTCPJSONConnection.fDisconnect();
 };
-function cConnection_fSendInitializationMessage(oThis, sType, sVersion) {
+function cConnection_fSendInitializationMessage(oThis, sType, sVersion, fCallback) {
   var dxMessage = {
     "initialize": sType,
     "version": sVersion,
@@ -122,6 +122,7 @@ function cConnection_fSendInitializationMessage(oThis, sType, sVersion) {
       oThis.emit("error", oRPCError);
       oThis.fDisconnect();
     }
+    if (fCallback) fCallback(oError);
   });
 };
 function cConnection_fSendCallMessage(oThis, sProcedure, xData, fResultCallback) {
@@ -218,8 +219,14 @@ function cConnection_fHandleInitializeMessage(oThis, dxMessage) {
         var oRPCError = new cRPCError(oErrorCodes.iInvalidJSONRPC, "Unexpected JSON RPC version request message", dxMessage);
         cConnection_fSendErrorMessageAndDisconnect(oThis, oRPCError);
       } else {
-        var sResponse = dxMessage["version"] == sVersion ? sInitializationVersionAccepted : sInitializationVersionRejected;
-        cConnection_fSendInitializationMessage(oThis, sResponse, sVersion);
+        var bVersionAccepted = dxMessage["version"] == sVersion,
+            sResponse = bVersionAccepted ? sInitializationVersionAccepted : sInitializationVersionRejected;
+        cConnection_fSendInitializationMessage(oThis, sResponse, sVersion, function (oError) {
+          if (!oError && bVersionAccepted) {
+            oThis._bInitialized = true;
+            oThis.emit("initialize");
+          }
+        });
       }
       break;
     case sInitializationVersionAccepted:
