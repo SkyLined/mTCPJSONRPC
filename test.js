@@ -77,8 +77,11 @@ function fDisconnectWhenDone(oConnection, sSide) {
 };
 function fReportFinishedWhenDone(sSide) {
   console.log("connection disconnected on " + sSide + "-side");
-  if (bServerReceivedCall && bServerReceivedResult && bClientReceivedCall && bClientReceivedResult
-      && bServerDisconnected && bClientDisconnected) {
+  if (bServerDisconnected && bClientDisconnected) {
+    if (!bServerReceivedCall) throw new Error("The server did not receive a call");
+    if (!bClientReceivedCall) throw new Error("The client did not receive a call");
+    if (!bServerReceivedResult) throw new Error("The server did not receive a result");
+    if (!bClientReceivedResult) throw new Error("The client did not receive a result");
     console.log("test completed successfully");
   };
 };
