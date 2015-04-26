@@ -2,4 +2,4 @@ var path = require("path");
 var sModuleName = path.basename(__dirname);
 module.exports.cServer = require("./cServer.js");
 module.exports.fConnect = require("./fConnect.js");
-module.exports.oErrorCodes = require("./oErrorCodes.js");
+module.exports.mErrorCodes = require("./mErrorCodes.js");
