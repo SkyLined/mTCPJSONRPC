@@ -1,10 +1,12 @@
 module.exports = function cConnection_fSendErrorMessage(oThis, oRPCError, uId, fCallback) {
-  var oStringifiableError = {};
+  // Error objects cannot be converted to a string using JSON.stringify. To get around this, a copy of the Error
+  // object is created that has the same properties, but which can be converted to a string using JSON.stringify.
+  var oErrorDetails = {};
   Object.getOwnPropertyNames(oRPCError).forEach(function (sPropertyName) {
-    oStringifiableError[sPropertyName] = oRPCError[sPropertyName];
+    oErrorDetails[sPropertyName] = oRPCError[sPropertyName];
   });
   var dxMessage = {
-    "error": oStringifiableError,
+    "error": oErrorDetails,
   };
   if (uId !== undefined) {
     dxMessage["id"] = uId;

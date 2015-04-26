@@ -8,38 +8,6 @@ var cConnection_fHandleMessage = require("./cConnection_fHandleMessage"),
     mSettings = require("./mSettings"),
     mUtil = require("util");
 
-// Communcation is base on JSON-RPC 2.0, but allows "full-duplex" RPC: both ends of a connection can make requests,
-// return results and report errors. To achieve this, a few changes have been made:
-// A request object looks like this:
-//   {"jsonrpc": "3.0", "call": <string> [, "data": <any>] [, "id": <int or string>]}
-// Where:
-//   - "call" contains the name of the procedure to be called. This is similar to the "method" field of JSON-RPC v2.0,
-//            but there are no reserved words.
-//   - "data" contains data to be passed to the procedure. This is similar to the "params" field of JSON-RPC 2.0, but
-//            it can have any value.
-//   - "id" the same as in JSON-RPC 2.0, but the value must not be a floating-point number and must not have been used
-//            in a previous request.
-// When a request is received, the function associated with the value in the "call" field should be executed and the
-// value inthe "data" field should be passed as a parameter. If an "id" field is provided, exactly one result or error
-// object must be sent back with the same value in its "id" field.
-// A result object looks like this:
-//   {"jsonrpc": "3.0", "result": {["error": <undefined or object>] [, "data": <any>]}, "id": <uint>}
-// Where:
-//   - "result" is an object containing an "error" and/or a "data" field.
-//   - "error" is undefined or an error that occured while executing the procedure.
-//   - "data" is undefined or whatever data is the result of performing the procedure.
-//   - "id" the value of the "id" field of the associated request object.
-// If both "error" and "data" are provided, at least one of these two must have the value <undefined>.
-// Note that if an error occurs while executing the procedure for which a callback is expected, a "result" object
-// should be send back and not an "error" object. The later is used for errors in the JSON-RPC layer. 
-// Whenever an error in the JSON-RPC layer occurs, an error object must be send to the remote end:
-//   {"jsonrpc": "3.0", "error": <object> [, "id": <uint>]}
-// Where:
-//   - "error" is an error that represents the issue.
-//   - "id" the value of the "id" field of the associated request object.
-
-// Error objects cannot be converted to a string using JSON.stringify. To get around this, a copy of the Error
-// object is created that has the same properties, but which can be converted to a string using JSON.stringify.
 function cRPCError(iCode, sMessage, xData) {
   var oThis = this;
   Error.call(oThis);
