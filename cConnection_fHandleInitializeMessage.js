@@ -1,22 +1,26 @@
-var mSettings = require("./mSettings"),
-    cConnection_fSendErrorMessage = require("./cConnection_fSendErrorMessage"),
-    cConnection_fSendErrorMessageAndDisconnect = require("./cConnection_fSendErrorMessageAndDisconnect"),
-    cConnection_fSendInitializationMessage = require("./cConnection_fSendInitializationMessage");
+module.exports = cConnection_fHandleInitializeMessage;
 
-module.exports = function cConnection_fHandleInitializeMessage(oThis, dxMessage) {
+var cConnection_fSendErrorMessage = require("./cConnection_fSendErrorMessage"),
+    cConnection_fSendErrorMessageAndDisconnect = require("./cConnection_fSendErrorMessageAndDisconnect"),
+    cConnection_fSendInitializationMessage = require("./cConnection_fSendInitializationMessage"),
+    cRPCError = require("./cRPCError"),
+    dxSettings = require("./dxSettings");
+
+function cConnection_fHandleInitializeMessage(oThis, dxMessage) {
   if (oThis._bInitialized) {
-    var oRPCError = new cRPCError(mErrorCodes.iInvalidJSONRPC, "Unexpected JSON RPC initialize message", dxMessage);
+    var oRPCError = new cRPCError(dxErrorCodes.iInvalidJSONRPC, dxErrorCodes.sUnexpectedJSONRPCInitialize, dxMessage);
     cConnection_fSendErrorMessage(oThis, oRPCError);
   } else switch (dxMessage["initialize"]) {
-    case mSettings.sInitializationVersionRequest:
+    case dxSettings.sInitializationVersionRequest:
       if (oThis._bVersionRequested) {
-        var oRPCError = new cRPCError(mErrorCodes.iInvalidJSONRPC, "Unexpected JSON RPC version request message", dxMessage);
+        var oRPCError = new cRPCError(dxErrorCodes.iInvalidJSONRPC, dxErrorCodes.sUnexpectedJSONRPCVersionRequest,
+            dxMessage);
         cConnection_fSendErrorMessageAndDisconnect(oThis, oRPCError);
       } else {
-        var bVersionAccepted = dxMessage["version"] == mSettings.sVersion,
-            sResponse = bVersionAccepted ? mSettings.sInitializationVersionAccepted
-                : mSettings.sInitializationVersionRejected;
-        cConnection_fSendInitializationMessage(oThis, sResponse, mSettings.sVersion, function (oError) {
+        var bVersionAccepted = dxMessage["version"] == dxSettings.sVersion,
+            sResponse = bVersionAccepted ? dxSettings.sInitializationVersionAccepted
+                : dxSettings.sInitializationVersionRejected;
+        cConnection_fSendInitializationMessage(oThis, sResponse, dxSettings.sVersion, function (oError) {
           if (!oError && bVersionAccepted) {
             oThis._bInitialized = true;
             oThis.emit("initialize");
@@ -24,34 +28,38 @@ module.exports = function cConnection_fHandleInitializeMessage(oThis, dxMessage)
         });
       }
       break;
-    case mSettings.sInitializationVersionAccepted:
+    case dxSettings.sInitializationVersionAccepted:
       if (!oThis._bVersionRequested) {
-        var oRPCError = new cRPCError(mErrorCodes.iInvalidJSONRPC, "Unexpected JSON RPC version accept message", dxMessage);
+        var oRPCError = new cRPCError(dxErrorCodes.iInvalidJSONRPC, dxErrorCodes.sUnexpectedJSONRPCVersionAccept,
+            dxMessage);
         cConnection_fSendErrorMessageAndDisconnect(oThis, oRPCError);
-      } else if (dxMessage["version"] != mSettings.sVersion) {
-        var oRPCError = new cRPCError(mErrorCodes.iInvalidJSONRPC, "Invalid JSON RPC version accept message", dxMessage);
+      } else if (dxMessage["version"] != dxSettings.sVersion) {
+        var oRPCError = new cRPCError(dxErrorCodes.iInvalidJSONRPC, dxErrorCodes.sInvalidJSONRPCVersionAccept,
+            dxMessage);
         cConnection_fSendErrorMessageAndDisconnect(oThis, oRPCError);
       } else {
         oThis._bInitialized = true;
         oThis.emit("initialize");
       };
       break;
-    case mSettings.sInitializationVersionRejected:
+    case dxSettings.sInitializationVersionRejected:
       if (!oThis._bVersionRequested) {
-        var oRPCError = new cRPCError(mErrorCodes.iInvalidJSONRPC, "Unexpected JSON RPC version reject message", dxMessage);
+        var oRPCError = new cRPCError(dxErrorCodes.iInvalidJSONRPC, dxErrorCodes.sUnexpectedJSONRPCVersionReject,
+            dxMessage);
         cConnection_fSendErrorMessageAndDisconnect(oThis, oRPCError);
-      } else if (dxMessage["version"] != mSettings.sVersion) {
-        var oRPCError = new cRPCError(mErrorCodes.iInvalidJSONRPC, "Invalid JSON RPC version reject message", dxMessage);
+      } else if (dxMessage["version"] != dxSettings.sVersion) {
+        var oRPCError = new cRPCError(dxErrorCodes.iInvalidJSONRPC, dxErrorCodes.sInvalidJSONRPCVersionReject,
+            dxMessage);
         cConnection_fSendErrorMessageAndDisconnect(oThis, oRPCError);
       } else {
-        var oRPCError = new cRPCError(mErrorCodes.iInvalidJSONRPC, "Rejected JSON RPC version " + mSettings.sVersion, dxMessage);
+        var oRPCError = new cRPCError(dxErrorCodes.iInvalidJSONRPC, dxErrorCodes.sRejectedJSONRPCVersion, dxMessage);
         // For backwards compatibility, you may want to accept earlier versions where appropriate.
         oThis.emit("error", oRPCError);
         oThis.fDisconnect();
       };
       break;
     default:
-      var oRPCError = new cRPCError(mErrorCodes.iInvalidJSONRPC, "Invalid JSON RPC initialize message", dxMessage);
+      var oRPCError = new cRPCError(dxErrorCodes.iInvalidJSONRPC, dxErrorCodes.sInvalidJSONRPCInitialize, dxMessage);
       cConnection_fSendErrorMessageAndDisconnect(oThis, oRPCError);
   };
 };

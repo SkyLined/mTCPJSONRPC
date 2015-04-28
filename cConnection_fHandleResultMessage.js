@@ -1,9 +1,12 @@
-var cConnection_fSendErrorMessage = require("./cConnection_fSendErrorMessage");
+module.exports = cConnection_fHandleResultMessage;
 
-module.exports = function cConnection_fHandleResultMessage(oThis, dxMessage) {
+var cConnection_fSendErrorMessage = require("./cConnection_fSendErrorMessage"),
+    cRPCError = require("./cRPCError");
+
+function cConnection_fHandleResultMessage(oThis, dxMessage) {
   var fCallback = oThis._dfPendingCallbacks[dxMessage["id"]];
   if (!fCallback) {
-    var oRPCError = new cRPCError(mErrorCodes.iInvalidId, "Invalid result id", dxMessage["id"]);
+    var oRPCError = new cRPCError(dxErrorCodes.iInvalidId, dxErrorCodes.sInvalidId, dxMessage["id"]);
     cConnection_fSendErrorMessage(oThis, oRPCError);
   } else {
     delete oThis._dfPendingCallbacks[dxMessage["id"]];

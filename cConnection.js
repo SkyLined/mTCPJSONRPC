@@ -3,33 +3,19 @@ module.exports = cConnection;
 var cConnection_fHandleMessage = require("./cConnection_fHandleMessage"),
     cConnection_fSendCallMessage = require("./cConnection_fSendCallMessage"),
     cConnection_fSendInitializationMessage = require("./cConnection_fSendInitializationMessage"),
-    mErrorCodes = require("./mErrorCodes"),
+    dxErrorCodes = require("./dxErrorCodes"),
     mEvents = require("events"),
-    mSettings = require("./mSettings"),
+    dxSettings = require("./dxSettings"),
     mUtil = require("util");
 
-function cRPCError(iCode, sMessage, xData) {
-  var oThis = this;
-  Error.call(oThis);
-  oThis.message = sMessage;
-  oThis.code = iCode;
-  if (xData !== undefined) oThis.data = xData;
-};
-cRPCError.prototype.__proto__ = Error.prototype;
-cRPCError.prototype.name = 'RPCError';
-cRPCError.prototype.toString = function cRPCError_toString() {
-  var oThis = this;
-  var sDataMessage = ("data" in oThis ? ", data: " + JSON.stringify(oThis.data) : "");
-  return "RPCError(" + oThis.code + ": " + oThis.message + sDataMessage + ")";
-};
 function cConnection(oTCPJSONConnection, bRequestVersion, dxOptions) {
-  if (this.constructor != arguments.callee) return new arguments.callee(dfProcedures, oTCPJSONConnection);
+  if (this.constructor != arguments.callee) throw new Error("This is a constructor, not a function");
   // events: error, initialize, disconnect
   var oThis = this;
   dxOptions = dxOptions || {};
   oThis.dfProcedures = dxOptions.dfProcedures || {};
-  oThis._uResultTimeout = dxOptions.uResultTimeout || mSettings.uResultTimeout; // default 10 seconds
-  var sId = "RPC" + mSettings.sVersion + "@" + oTCPJSONConnection.toString();
+  oThis._uResultTimeout = dxOptions.uResultTimeout || dxSettings.uResultTimeout; // default 10 seconds
+  var sId = "RPC" + dxSettings.sVersion + "@" + oTCPJSONConnection.toString();
   Object.defineProperty(oThis, "sId", {"get": function () { return sId; }});
   oThis._oTCPJSONConnection = oTCPJSONConnection;
   Object.defineProperty(oThis, "bConnected", {"get": function () { return oThis._oTCPJSONConnection != null; }});
@@ -43,7 +29,7 @@ function cConnection(oTCPJSONConnection, bRequestVersion, dxOptions) {
   oThis._oTCPJSONConnection.on("disconnect", function () {
     oThis._oTCPJSONConnection = null;
     var oError = new Error("Connection closed");
-    oError.code = mErrorCodes.iConnectionFailed;
+    oError.code = dxErrorCodes.iConnectionFailed;
     for (var uId in oThis._dfPendingCallbacks) {
       var fCallback = oThis._dfPendingCallbacks[uId];
       clearTimeout(oThis._dfPendingCallbackTimeouts[uId]);
@@ -57,7 +43,7 @@ function cConnection(oTCPJSONConnection, bRequestVersion, dxOptions) {
     cConnection_fHandleMessage(oThis, oError, xMessage);
   });
   if (bRequestVersion) {
-    cConnection_fSendInitializationMessage(oThis, mSettings.sInitializationVersionRequest, mSettings.sVersion);
+    cConnection_fSendInitializationMessage(oThis, dxSettings.sInitializationVersionRequest, dxSettings.sVersion);
   };
 };
 mUtil.inherits(cConnection, mEvents.EventEmitter);

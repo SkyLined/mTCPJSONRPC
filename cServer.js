@@ -5,9 +5,8 @@ var cConnection = require("./cConnection"),
     mTCPJSON = require("mTCPJSON"),
     mUtil = require("util");
 
-
 function cServer(dxOptions) {
-  if (this.constructor != arguments.callee) return new arguments.callee(dxOptions);
+  if (this.constructor != arguments.callee) throw new Error("This is a constructor, not a function");
   // options: uIPVersion, sHostname, uPort, uConnectionKeepAlive (ms), dfProcedures
   // emits: error, start, connect, stop
   var oThis = this;

@@ -1,6 +1,9 @@
-var cConnection_fSendErrorMessage = require("./cConnection_fSendErrorMessage");
+module.exports = cConnection_fSendCallMessage;
 
-module.exports = function cConnection_fSendCallMessage(oThis, sProcedure, xData, fResultCallback) {
+var cConnection_fSendErrorMessage = require("./cConnection_fSendErrorMessage"),
+    cRPCError = require("./cRPCError");
+
+function cConnection_fSendCallMessage(oThis, sProcedure, xData, fResultCallback) {
   var dxMessage = {
     "call": sProcedure,
     "data": xData,
@@ -13,7 +16,7 @@ module.exports = function cConnection_fSendCallMessage(oThis, sProcedure, xData,
   oThis._fSendMessage(dxMessage, function(oError) {
     if (fResultCallback) {
       if (oError) { // Cannot send message, call callback with error
-        var oRPCError = new cRPCError(mErrorCodes.iConnectionFailed, "Unable to send call message", oError);
+        var oRPCError = new cRPCError(dxErrorCodes.iConnectionFailed, dxErrorCodes.sConnectionFailed, oError);
         process.nextTick(function () {
           fResultCallback(oThis, oRPCError);
         });
@@ -22,7 +25,7 @@ module.exports = function cConnection_fSendCallMessage(oThis, sProcedure, xData,
         oThis._dfPendingCallbackTimeouts[uId] = setTimeout(function () {
           delete oThis._dfPendingCallbacks[uId];
           delete oThis._dfPendingCallbackTimeouts[uId];
-          var oRPCError = new cRPCError(mErrorCodes.iResultTimeout, "Result timeout", 
+          var oRPCError = new cRPCError(dxErrorCodes.iResultTimeout, dxErrorCodes.sResultTimeout, 
               "Result was not received within " + (oThis._uResultTimeout / 1000) + " seconds");
           cConnection_fSendErrorMessage(oThis, oRPCError, uId);
           process.nextTick(function () {

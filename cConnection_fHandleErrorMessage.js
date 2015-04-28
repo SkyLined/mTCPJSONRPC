@@ -1,4 +1,6 @@
-module.exports = function cConnection_fHandleErrorMessage(oThis, dxMessage) {
+module.exports = cConnection_fHandleErrorMessage;
+
+function cConnection_fHandleErrorMessage(oThis, dxMessage) {
   // Remote is reporting an error in the JSONRPC layer: execute callback if any or emit an Error instance.
   var oError = new Error(dxMessage["error"].message);
   oError.code = dxMessage["error"].code;
