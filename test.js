@@ -1,5 +1,4 @@
-var cServer = require("./cServer.js"),
-    fConnect = require("./fConnect.js");
+var mTCPJSONRPC = require("./index");
 
 var bServerReceivedCall = false,
     bServerReceivedResult = false,
@@ -29,7 +28,7 @@ var bServerReceivedCall = false,
         }
       },
     },
-    oServer = new cServer({"dfProcedures": dfServerProcedures});
+    oServer = new mTCPJSONRPC.cServer({"dfProcedures": dfServerProcedures});
 oServer.on("connect", function (oConnection) {
   console.log("connection established on server-side");
   oConnection.on("initialize", function () {
@@ -49,7 +48,7 @@ oServer.on("connect", function (oConnection) {
     fReportFinishedWhenDone("server");
   });
 });
-fConnect(function (oError, oConnection) {
+mTCPJSONRPC.fConnect(function (oError, oConnection) {
   if (oError) throw oError;
   console.log("connection established on client-side");
   oConnection.on("initialize", function () {
