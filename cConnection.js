@@ -47,13 +47,13 @@ function cConnection(oTCPJSONConnection, bRequestVersion, dxOptions) {
   };
   Object.defineProperty(oThis, "uIPVersion", {
     "get": function() { return oThis._oTCPJSONConnection.uIPVersion; }
-  };
+  });
   Object.defineProperty(oThis, "sRemoteIP", {
     "get": function() { return oThis._oTCPJSONConnection.sRemoteIP; }
-  };
+  });
   Object.defineProperty(oThis, "uRemotePort", {
     "get": function() { return oThis._oTCPJSONConnection.uRemotePort; }
-  };
+  });
 };
 mUtil.inherits(cConnection, mEvents.EventEmitter);
 
