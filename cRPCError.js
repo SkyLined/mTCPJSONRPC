@@ -11,6 +11,6 @@ cRPCError.prototype.__proto__ = Error.prototype;
 cRPCError.prototype.name = "RPCError";
 cRPCError.prototype.toString = function cRPCError_toString() {
   var oThis = this;
-  var sDataMessage = ("data" in oThis ? ", data: " + JSON.stringify(oThis.data) : "");
-  return "RPCError(" + oThis.code + ": " + oThis.message + sDataMessage + ")";
+  return "RPCError #" + oThis.code + ": " + oThis.message + 
+      ("data" in oThis ? ", data: " + JSON.stringify(oThis.data) : "");
 };
