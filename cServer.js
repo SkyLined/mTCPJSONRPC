@@ -16,7 +16,7 @@ function cServer(dxOptions) {
   oThis._uPort = dxOptions.uPort;
   var uConnectionKeepAlive = dxOptions.uConnectionKeepAlive;
   oThis.dfProcedures = dxOptions.dfProcedures || {};
-  oThis._oTCPJSONServer = mTCPJSON.cServer({
+  oThis._oTCPJSONServer = new mTCPJSON.cServer({
     "uIPVersion": oThis._uIPVersion,
     "sHostname": sHostname,
     "uPort": oThis._uPort,
