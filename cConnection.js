@@ -15,7 +15,13 @@ function cConnection(oTCPJSONConnection, bRequestVersion, dxOptions) {
   dxOptions = dxOptions || {};
   oThis.dfProcedures = dxOptions.dfProcedures || {};
   oThis._uResultTimeout = dxOptions.uResultTimeout || dxSettings.uResultTimeout; // default 10 seconds
-  var sId = "RPC" + dxSettings.sVersion + "@" + oTCPJSONConnection.toString();
+  var uIPVersion = oTCPJSONConnection.uIPVersion,
+      sRemoteIP = oTCPJSONConnection.sRemoteIP,
+      uRemotePort = oTCPJSONConnection.uRemotePort,
+      sId = "JSONRPC" + dxSettings.sVersion + "@TCP" + uIPVersion + "@" + sRemoteIP + ":" + uRemotePort;
+  Object.defineProperty(oThis, "uIPVersion", { "get": function() { return uIPVersion; } });
+  Object.defineProperty(oThis, "sRemoteIP", { "get": function() { return sRemoteIP; } });
+  Object.defineProperty(oThis, "uRemotePort", { "get": function() { return uRemotePort; } });
   Object.defineProperty(oThis, "sId", {"get": function () { return sId; }});
   oThis._oTCPJSONConnection = oTCPJSONConnection;
   Object.defineProperty(oThis, "bConnected", {"get": function () { return oThis._oTCPJSONConnection != null; }});
@@ -45,15 +51,6 @@ function cConnection(oTCPJSONConnection, bRequestVersion, dxOptions) {
   if (bRequestVersion) {
     cConnection_fSendInitializationMessage(oThis, dxSettings.sInitializationVersionRequest, dxSettings.sVersion);
   };
-  Object.defineProperty(oThis, "uIPVersion", {
-    "get": function() { return oThis._oTCPJSONConnection.uIPVersion; }
-  });
-  Object.defineProperty(oThis, "sRemoteIP", {
-    "get": function() { return oThis._oTCPJSONConnection.sRemoteIP; }
-  });
-  Object.defineProperty(oThis, "uRemotePort", {
-    "get": function() { return oThis._oTCPJSONConnection.uRemotePort; }
-  });
 };
 mUtil.inherits(cConnection, mEvents.EventEmitter);
 
